@@ -1,3 +1,3 @@
-frozenlist==1.4.1  # или версия, где wheel существует
-yarl==1.x.x
+frozenlist==1.4.1
+yarl>=1.9.2,<2.0
 aiohttp==3.9.1
