@@ -806,10 +806,30 @@ def find_user_id_by_nick(group_id: int, nick: str):
     conn.close()
     return row[0] if row else None
 
-# Запуск
+# === Health-check сервер для Render ===
+import threading
+from aiohttp import web
+
+async def handle_health(request):
+    return web.Response(text="OK")
+
+def start_health_server():
+    app = web.Application()
+    app.router.add_get("/", handle_health)
+    import os
+    port = int(os.environ.get("PORT", 8080))  # Render задаёт PORT автоматически
+    print(f"🌐 Health-check сервер запущен на порту {port}")
+    web.run_app(app, host="0.0.0.0", port=port)
+
+# === Запуск ===
 async def main():
     init_db()
     print("Bot started")
+
+    # Запускаем health-server в фоновом потоке
+    threading.Thread(target=start_health_server, daemon=True).start()
+
+    # Запускаем Telegram-бот
     await dp.start_polling(bot, skip_updates=True)
 
 if __name__ == "__main__":
@@ -817,3 +837,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         print("Bot stopped")
+
