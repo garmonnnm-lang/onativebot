@@ -1,4 +1,3 @@
+frozenlist==1.4.1  # или версия, где wheel существует
+yarl==1.x.x
 aiohttp==3.9.1
-yarl==1.9.2
-multidict==6.0.4
-frozenlist==1.3.1
