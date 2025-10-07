@@ -13,7 +13,7 @@ from aiogram.enums import ParseMode
 TOKEN = "8250715277:AAHnxkwtZSjelvwHTJy_MBte1fuy_dLqk4o"  # ⚠️ замени на свой
 DB = "stats.db"
 VIP_PHOTO_URL = "https://avatars.mds.yandex.net/i?id=0a32206d7db896dc1412d53ff74ef5b0_l-5386437-images-thumbs&n=13"
-PROMO_CODE = "VIP2025"
+PROMO_CODE = "PENISS"
 
 REL_LEVELS = {
     1: {"name": "Симпатия 😊", "need": 0},
