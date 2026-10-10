@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#07142b" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TIDEBOUND" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/icon-180.png" />
+    <title>TIDEBOUND — Грейхейвен</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1f4a'/%3E%3Cpath d='M28 8h8l3 14H25z' fill='%23f5f1e6'/%3E%3Cpath d='M25 22h14l3 26H22z' fill='%23d9503f'/%3E%3Cpath d='M6 50q8-8 16 0t16 0t16 0v8H6z' fill='%233aa6e8'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/styles/main.css" />
+  </head>
+  <body>
+    <canvas id="game-canvas"></canvas>
+
+    <!-- ЗАГРУЗКА -->
+    <section id="screen-loading" class="screen active">
+      <div class="loading-card">
+        <div class="logo logo-big" aria-label="TIDEBOUND">
+          <svg class="logo-lighthouse" viewBox="0 0 64 72" aria-hidden="true">
+            <path d="M27 6h10l2 12H25z" fill="#f5f1e6" />
+            <rect x="29" y="2" width="6" height="5" rx="1" fill="#ffd54a" />
+            <path d="M25 18h14l4 38H21z" fill="#e8eef7" />
+            <path d="M24 28h16l1 8H23z M22.5 42h19l.8 8H21.7z" fill="#d9503f" />
+            <path d="M2 60q10-9 20 0t20 0t20 0v12H2z" fill="#2f9ae6" />
+          </svg>
+          <span class="logo-word">TIDEBOUND</span>
+        </div>
+        <div class="logo-sub">Грейхейвен · Твой новый дом у моря</div>
+        <div class="progress"><div id="loading-bar"></div></div>
+        <div id="loading-text" class="muted">Подготовка…</div>
+        <div id="loading-error" class="error-box hidden"></div>
+      </div>
+    </section>
+
+    <!-- ГЛАВНОЕ МЕНЮ -->
+    <section id="screen-main" class="screen">
+      <div class="menu-column">
+        <div class="logo" aria-label="TIDEBOUND">
+          <svg class="logo-lighthouse" viewBox="0 0 64 72" aria-hidden="true">
+            <path d="M27 6h10l2 12H25z" fill="#f5f1e6" />
+            <rect x="29" y="2" width="6" height="5" rx="1" fill="#ffd54a" />
+            <path d="M25 18h14l4 38H21z" fill="#e8eef7" />
+            <path d="M24 28h16l1 8H23z M22.5 42h19l.8 8H21.7z" fill="#d9503f" />
+            <path d="M2 60q10-9 20 0t20 0t20 0v12H2z" fill="#2f9ae6" />
+          </svg>
+          <span class="logo-word">TIDEBOUND</span>
+        </div>
+        <div class="logo-sub">Грейхейвен · Твой новый дом у моря</div>
+
+        <div class="menu-list">
+          <button class="menu-btn hidden" id="btn-continue" data-icon="play">Продолжить</button>
+          <button class="menu-btn primary" id="btn-play" data-icon="play">Играть</button>
+          <button class="menu-btn" id="btn-create" data-icon="people">Создать комнату</button>
+          <button class="menu-btn" id="btn-join" data-icon="link">Присоединиться к комнате</button>
+          <button class="menu-btn" id="btn-single" data-icon="person">Одиночная игра</button>
+          <div class="menu-gap"></div>
+          <button class="menu-btn" id="btn-settings" data-icon="gear">Настройки</button>
+          <button class="menu-btn" id="btn-controls" data-icon="pad">Управление</button>
+          <button class="menu-btn" id="btn-exit" data-icon="exit">Выход</button>
+        </div>
+        <div class="version">v0.1.0 &nbsp;|&nbsp; Браузерная 3D survival игра</div>
+      </div>
+      <div class="world-card">
+        <div class="world-card-art"></div>
+        <div>
+          <div class="world-card-title">Грейхейвен</div>
+          <div class="muted small">⚓ Открытый мир</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- СПИСОК ЛОББИ -->
+    <section id="screen-lobbies" class="screen">
+      <div class="panel wide">
+        <header class="panel-head">
+          <h2><span class="ic" data-icon="people"></span> Список лобби</h2>
+          <div class="head-actions">
+            <button class="btn ghost" id="lobby-refresh"><span class="ic" data-icon="refresh"></span> Обновить</button>
+            <button class="btn ghost" id="lobby-back">Назад</button>
+          </div>
+        </header>
+        <div class="search-row">
+          <input id="lobby-search" class="input" type="search" placeholder="Поиск по названию или коду…" autocomplete="off" />
+        </div>
+        <div class="table-wrap">
+          <table class="lobby-table">
+            <thead>
+              <tr><th>Название</th><th>Код</th><th>Игроки</th><th>Режим</th><th>Статус</th><th></th></tr>
+            </thead>
+            <tbody id="lobby-rows"></tbody>
+          </table>
+          <div id="lobby-state" class="state-box"></div>
+        </div>
+        <footer class="panel-foot">
+          <div class="pager" id="lobby-pager"></div>
+          <div class="muted" id="lobby-total">Всего лобби: 0</div>
+        </footer>
+      </div>
+    </section>
+
+    <!-- СОЗДАНИЕ КОМНАТЫ -->
+    <section id="screen-create" class="screen">
+      <div class="panel create">
+        <header class="panel-head">
+          <h2><span class="ic" data-icon="people"></span> Создание комнаты</h2>
+        </header>
+        <div class="create-body">
+          <div class="create-form">
+            <button class="link-btn" id="create-back">← Назад</button>
+            <div id="create-error" class="error-box hidden"></div>
+
+            <label class="field">
+              <span>Ваше имя</span>
+              <input id="room-player-name" class="input" maxlength="20" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>Название комнаты</span>
+              <input id="room-name" class="input" maxlength="32" value="Моя крутая комната" />
+            </label>
+            <div class="field-row">
+              <label class="field">
+                <span>Режим игры</span>
+                <select id="room-mode" class="input"><option value="coop">Кооператив</option></select>
+              </label>
+              <label class="field">
+                <span>Максимум игроков</span>
+                <select id="room-max" class="input">
+                  <option>2</option><option>3</option><option selected>4</option><option>6</option><option>8</option>
+                </select>
+              </label>
+            </div>
+            <label class="field">
+              <span>Приватность</span>
+              <select id="room-privacy" class="input">
+                <option value="open">Открытая (видна в списке)</option>
+                <option value="code">Только по коду</option>
+                <option value="private">Приватная (по ссылке)</option>
+              </select>
+            </label>
+            <label class="check"><input type="checkbox" id="room-link" checked /> Разрешить присоединение по ссылке</label>
+
+            <div class="field-row">
+              <div class="field">
+                <span>Код комнаты</span>
+                <div class="copy-row"><input id="room-code" class="input" readonly value="—" /><button class="btn small" id="copy-code" disabled>Скопировать</button></div>
+              </div>
+              <div class="field">
+                <span>Ссылка-приглашение</span>
+                <div class="copy-row"><input id="room-link-url" class="input" readonly value="—" /><button class="btn small" id="copy-link" disabled>Скопировать</button></div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="create-side">
+            <div class="world-preview">
+              <div class="world-card-art tall"></div>
+              <div class="world-preview-title">Грейхейвен</div>
+              <p class="muted small">Небольшой прибрежный городок, полный ресурсов, тайн и возможностей. Выживайте, стройте, исследуйте!</p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="players-box">
+          <h3>Игроки (<span id="room-players-count">1</span>/<span id="room-players-max">4</span>)</h3>
+          <ul id="room-players" class="player-list"></ul>
+        </div>
+        <div class="create-actions">
+          <button class="btn big" id="room-create">Создать комнату</button>
+          <button class="btn ghost big hidden" id="room-leave">Покинуть комнату</button>
+          <button class="btn primary big hidden" id="room-start" disabled>▶ Начать игру</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ПРИСОЕДИНЕНИЕ ПО КОДУ -->
+    <section id="screen-join" class="screen">
+      <div class="panel narrow">
+        <header class="panel-head"><h2><span class="ic" data-icon="link"></span> Присоединиться к комнате</h2></header>
+        <div class="panel-pad">
+          <div id="join-error" class="error-box hidden"></div>
+          <label class="field">
+            <span>Ваше имя</span>
+            <input id="join-name" class="input" maxlength="20" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>Код комнаты</span>
+            <input id="join-code" class="input code-input" maxlength="8" placeholder="например, K7F3" autocomplete="off" spellcheck="false" />
+          </label>
+          <p class="muted small">Код состоит из 4–8 латинских букв и цифр. Его показывает создатель комнаты.</p>
+          <div class="row-end">
+            <button class="btn ghost" id="join-back">Назад</button>
+            <button class="btn primary" id="join-go">Присоединиться</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- НАСТРОЙКИ -->
+    <section id="screen-settings" class="screen">
+      <div class="panel settings">
+        <aside class="settings-tabs" id="settings-tabs">
+          <h2><span class="ic" data-icon="gear"></span> Настройки</h2>
+          <button class="tab active" data-tab="game"><span class="ic" data-icon="pad"></span> Игра</button>
+          <button class="tab" data-tab="graphics"><span class="ic" data-icon="monitor"></span> Графика</button>
+          <button class="tab" data-tab="sound"><span class="ic" data-icon="sound"></span> Звук</button>
+          <button class="tab" data-tab="controls"><span class="ic" data-icon="pad"></span> Управление</button>
+          <button class="tab" data-tab="interface"><span class="ic" data-icon="layout"></span> Интерфейс</button>
+        </aside>
+        <div class="settings-body">
+          <div id="settings-content"></div>
+          <div class="settings-foot">
+            <button class="btn ghost" id="settings-back">← Назад</button>
+            <button class="btn ghost" id="settings-reset"><span class="ic" data-icon="refresh"></span> Сбросить настройки</button>
+            <button class="btn primary" id="settings-apply"><span class="ic" data-icon="check"></span> Применить</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- УПРАВЛЕНИЕ -->
+    <section id="screen-controls" class="screen">
+      <div class="panel narrow">
+        <header class="panel-head"><h2><span class="ic" data-icon="pad"></span> Управление</h2><button class="btn ghost" id="controls-back">Назад</button></header>
+        <div class="panel-pad"><table class="keys-table" id="controls-table"></table>
+          <p class="muted small">Переназначение клавиш пока не реализовано — раскладка фиксированная.</p></div>
+      </div>
+    </section>
+
+    <!-- ПАУЗА -->
+    <section id="screen-pause" class="screen pause">
+      <div class="pause-card">
+        <header class="pause-head">
+          <div class="logo small"><span class="logo-word">TIDEBOUND</span></div>
+          <div class="pause-info"><div class="muted">Игроков: <span id="pause-players">1/1</span></div><div id="pause-room" class="muted small"></div></div>
+        </header>
+        <div class="menu-list">
+          <button class="menu-btn primary" id="pause-resume" data-icon="play">Продолжить</button>
+          <button class="menu-btn" id="pause-save" data-icon="check">Сохранить игру</button>
+          <button class="menu-btn" id="pause-settings" data-icon="gear">Настройки</button>
+          <button class="menu-btn" id="pause-controls" data-icon="pad">Управление</button>
+          <button class="menu-btn" id="pause-players-btn" data-icon="people">Список игроков</button>
+          <button class="menu-btn" id="pause-leave" data-icon="exit">Выйти в меню</button>
+        </div>
+        <footer class="pause-foot kbd-hint"><span class="kbd">Esc</span> Назад</footer>
+      </div>
+    </section>
+
+    <!-- СМЕРТЬ -->
+    <section id="screen-death" class="screen death">
+      <div class="death-card">
+        <h1>Вы погибли</h1>
+        <p id="death-cause" class="muted"></p>
+        <p class="muted small">Ваши вещи остались в рюкзаке на месте гибели.</p>
+        <button class="btn primary big" id="death-respawn">Возродиться</button>
+      </div>
+    </section>
+
+    <!-- HUD -->
+    <div id="hud" class="hud hidden">
+      <div class="hud-top">
+        <div class="hud-brand"><span class="logo-word tiny">TIDEBOUND</span></div>
+        <div class="hud-chip" id="hud-time">☀ День 1 · 12:00</div>
+        <div class="hud-chip" id="hud-weather">☀️ Ясно</div>
+        <div class="hud-spacer"></div>
+        <div class="hud-chip" id="hud-room">Одиночная игра</div>
+        <div class="hud-chip" id="hud-players">👥 1/1</div>
+        <div class="hud-chip hidden" id="hud-fps">60 FPS</div>
+      </div>
+
+      <div id="rotate-hint" class="rotate-hint"><div class="rotate-ic">📱↻</div><div>Поверните телефон горизонтально</div></div>
+      <div id="crosshair" class="crosshair"></div>
+      <div id="prompt" class="prompt hidden"><span class="kbd kbd-hint">E</span><span id="prompt-text"></span></div>
+      <div id="fish-hint" class="fish-hint hidden"></div>
+      <div id="reel-box" class="reel-box hidden">
+        <div class="reel-row"><span>Вываживание</span><div class="bar"><div id="reel-progress"></div></div></div>
+        <div class="reel-row"><span>Натяжение</span><div class="bar tension"><div id="reel-tension"></div></div></div>
+        <div id="reel-pull" class="muted small">&nbsp;</div>
+      </div>
+      <div id="action-box" class="action-box hidden"><div id="action-label"></div><div class="bar"><div id="action-bar"></div></div></div>
+      <div id="catch-card" class="catch-card hidden"></div>
+
+      <div class="hud-left">
+        <div id="feed" class="feed"></div>
+      </div>
+      <div id="toasts" class="toasts"></div>
+
+      <div class="hud-status">
+        <div class="stat"><span class="stat-ic">❤</span><div class="bar hp"><div id="bar-hp"></div></div></div>
+        <div class="stat"><span class="stat-ic">🍖</span><div class="bar food"><div id="bar-food"></div></div></div>
+        <div class="stat"><span class="stat-ic">💧</span><div class="bar water"><div id="bar-water"></div></div></div>
+        <div class="stat"><span class="stat-ic">⚡</span><div class="bar stam"><div id="bar-stam"></div></div></div>
+        <div class="level-row"><span id="lvl-text">Ур. 1</span><div class="bar xp"><div id="bar-xp"></div></div><span id="xp-text" class="muted small">0 / 60</span></div>
+      </div>
+
+      <div id="hotbar" class="hotbar"></div>
+
+      <div id="minimap-wrap" class="minimap-wrap">
+        <canvas id="minimap" width="200" height="200"></canvas>
+        <div class="minimap-n">N</div>
+      </div>
+
+      <div id="damage-vignette" class="vignette"></div>
+      <div id="fade" class="fade"></div>
+    </div>
+
+    <!-- ИНВЕНТАРЬ -->
+    <section id="screen-inventory" class="screen overlay">
+      <div class="panel inv">
+        <header class="panel-head"><h2>Инвентарь</h2><div><button class="btn ghost small" id="inv-to-craft">Крафт<span class="kbd-hint"> (G)</span></button> <span class="muted small kbd-hint">Tab / Esc — закрыть</span> <button class="btn small touch-only" id="inv-close">✕ Закрыть</button></div></header>
+        <div class="inv-body">
+          <div>
+            <div id="inv-grid" class="inv-grid"></div>
+            <div class="muted small inv-hint">Клик — выбрать, второй клик — переместить/объединить. Первые 5 слотов — быстрые (1–5).</div>
+          </div>
+          <aside class="inv-detail" id="inv-detail"></aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- КРАФТ -->
+    <section id="screen-craft" class="screen overlay">
+      <div class="panel inv">
+        <header class="panel-head">
+          <h2 id="craft-title">Крафт</h2>
+          <div><button class="btn ghost small" id="craft-to-inv">Инвентарь</button> <span class="muted small kbd-hint">G / Esc — закрыть</span> <button class="btn small touch-only" id="craft-close">✕ Закрыть</button></div>
+        </header>
+        <div class="inv-body craft-body">
+          <div id="craft-list" class="craft-list"></div>
+          <aside class="inv-detail" id="craft-detail"></aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- СПИСОК ИГРОКОВ -->
+    <section id="screen-players" class="screen overlay">
+      <div class="panel narrow">
+        <header class="panel-head"><h2>Игроки</h2><button class="btn ghost small" id="players-close">Закрыть</button></header>
+        <ul id="players-list" class="player-list big"></ul>
+        <div class="panel-pad"><p class="muted small" id="players-note"></p></div>
+      </div>
+    </section>
+
+    <div id="net-banner" class="net-banner hidden"></div>
+
+    <!-- ОТЛАДКА -->
+    <div id="debug" class="debug hidden"></div>
+    <div id="click-to-play" class="click-to-play hidden">Нажмите, чтобы продолжить игру</div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

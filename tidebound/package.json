@@ -1,0 +1,30 @@
+{
+  "name": "tidebound",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TIDEBOUND — браузерная 3D survival-игра (Three.js + TypeScript + Vite)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit && tsc -p server/tsconfig.json",
+    "server": "tsx server/index.ts",
+    "server:dev": "tsx watch server/index.ts",
+    "dev:all": "node scripts/dev-all.mjs",
+    "start": "npm run build && tsx server/index.ts"
+  },
+  "dependencies": {
+    "three": "0.186.0"
+  },
+  "devDependencies": {
+    "@types/three": "0.186.0",
+    "typescript": "5.9.3",
+    "vite": "7.1.12",
+    "tsx": "4.20.6",
+    "@types/node": "22.18.0"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
+}

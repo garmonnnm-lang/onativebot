@@ -1,0 +1,16 @@
+# Render Blueprint: один Web Service отдаёт и клиент (dist/), и WebSocket кооператива.
+services:
+  - type: web
+    name: tidebound
+    runtime: node
+    plan: free            # для кооператива без «засыпания» возьмите starter
+    region: frankfurt
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm run server
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: DATA_DIR
+        value: /tmp/tidebound-rooms   # на free-плане диска нет: комнаты живут до перезапуска
